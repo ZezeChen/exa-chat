@@ -29,3 +29,19 @@ export interface SearchRequest {
   excludeDomains?: string[];
   category?: string;
 }
+
+// Answer Mode Types
+export interface Citation {
+  id: string;
+  url: string;
+  title: string;
+}
+
+export interface AnswerResponse {
+  answer: string;
+  citations: Citation[];
+}
+
+export interface AnswerRequest {
+  query: string;
+}
