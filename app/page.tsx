@@ -98,26 +98,6 @@ export default function Home() {
                     size="lg"
                     isClearable
                     onClear={() => setQuery("")}
-                    classNames={{
-                      base: "flex-1",
-                      mainWrapper: "h-12",
-                      inputWrapper: [
-                        "h-12",
-                        "shadow-sm",
-                        "bg-default-100",
-                        "dark:bg-default-50/10",
-                        "hover:bg-default-200/70",
-                        "dark:hover:bg-default/20",
-                        "group-data-[focus=true]:bg-default-100",
-                        "dark:group-data-[focus=true]:bg-default-50/10",
-                        "!cursor-text",
-                      ],
-                      innerWrapper: "gap-3",
-                      input: [
-                        "text-base",
-                        "placeholder:text-default-400",
-                      ],
-                    }}
                     startContent={
                       <Search className="w-5 h-5 text-default-400 shrink-0" />
                     }
@@ -169,23 +149,7 @@ export default function Home() {
                     onClear={() => setQuery("")}
                     classNames={{
                       base: "flex-1",
-                      mainWrapper: "h-10",
-                      inputWrapper: [
-                        "h-10",
-                        "shadow-sm",
-                        "bg-default-100",
-                        "dark:bg-default-50/10",
-                        "hover:bg-default-200/70",
-                        "dark:hover:bg-default/20",
-                        "group-data-[focus=true]:bg-default-100",
-                        "dark:group-data-[focus=true]:bg-default-50/10",
-                        "!cursor-text",
-                      ],
-                      innerWrapper: "gap-3",
-                      input: [
-                        "text-sm",
-                        "placeholder:text-default-400",
-                      ],
+                      // inputWrapper: "h-10 shadow-sm",
                     }}
                     startContent={
                       <Search className="w-4 h-4 text-default-400 shrink-0" />
@@ -193,6 +157,7 @@ export default function Home() {
                   />
                   <Button
                     color="primary"
+                    size="lg"
                     radius="lg"
                     className="font-semibold px-6 h-10 shrink-0"
                     onPress={handleSearch}

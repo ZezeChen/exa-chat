@@ -3,6 +3,7 @@ export interface SearchResult {
   url: string;
   title: string;
   text?: string;
+  summary?: string;
   highlights?: string[];
   highlightScores?: number[];
   publishedDate?: string;

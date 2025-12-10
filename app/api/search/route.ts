@@ -35,6 +35,9 @@ export async function POST(request: NextRequest) {
         numSentences: 3,
         highlightsPerUrl: 3,
       },
+      summary: {
+        query: query,
+      },
     });
 
     const results: SearchResult[] = searchResponse.results.map((result) => ({
@@ -42,6 +45,7 @@ export async function POST(request: NextRequest) {
       url: result.url,
       title: result.title || "Untitled",
       text: result.text,
+      summary: result.summary,
       highlights: result.highlights,
       highlightScores: result.highlightScores,
       publishedDate: result.publishedDate,

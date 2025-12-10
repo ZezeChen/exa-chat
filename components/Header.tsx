@@ -21,13 +21,11 @@ export function Header() {
 
   return (
     <Navbar maxWidth="xl" isBordered>
-      <NavbarBrand>
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-primary-100 dark:bg-primary-900/30">
-            <Sparkles className="w-5 h-5 text-primary" />
-          </div>
-          <span className="font-bold text-lg text-foreground">Exa Search</span>
+      <NavbarBrand className="gap-2">
+        <div className="p-1.5 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+          <Sparkles className="w-5 h-5 text-primary" />
         </div>
+        <p className="font-bold text-lg text-foreground">Exa Search</p>
       </NavbarBrand>
 
       <NavbarContent justify="end">
