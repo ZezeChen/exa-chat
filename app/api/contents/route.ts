@@ -3,7 +3,9 @@ import Exa from "exa-js";
 
 export const runtime = "edge";
 
-const exa = new Exa(process.env.EXA_API_KEY);
+function getExa() {
+  return new Exa(process.env.EXA_API_KEY);
+}
 
 export interface ContentsRequest {
   ids: string[];
@@ -40,6 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const exa = getExa();
     const contentsResponse = await exa.getContents(ids, {
       text: {
         maxCharacters: 10000, // Get more content for detail view

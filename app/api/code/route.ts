@@ -4,7 +4,9 @@ import type { CodeRequest, CodeResponse, Citation, CodeMessage } from "@/lib/typ
 
 export const runtime = "edge";
 
-const exa = new Exa(process.env.EXA_API_KEY);
+function getExa() {
+  return new Exa(process.env.EXA_API_KEY);
+}
 
 // Build conversation context string
 function buildConversationContext(history: CodeMessage[]): string {
@@ -72,6 +74,7 @@ When answering coding questions:
 
 If the user refers to previous code or questions, use the provided context to give a relevant answer.`;
 
+    const exa = getExa();
     const answerResponse = await exa.answer(queryWithContext, {
       text: true,
       model: "exa",

@@ -4,7 +4,9 @@ import type { SearchRequest, SearchResponse, SearchResult } from "@/lib/types";
 
 export const runtime = "edge";
 
-const exa = new Exa(process.env.EXA_API_KEY);
+function getExa() {
+  return new Exa(process.env.EXA_API_KEY);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,6 +27,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const exa = getExa();
     const searchResponse = await exa.searchAndContents(query, {
       type,
       numResults,
