@@ -45,3 +45,19 @@ export interface AnswerResponse {
 export interface AnswerRequest {
   query: string;
 }
+
+// Code Mode Types (with context support)
+export interface CodeMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface CodeRequest {
+  query: string;
+  conversationHistory?: CodeMessage[];
+}
+
+export interface CodeResponse {
+  answer: string;
+  citations: Citation[];
+}

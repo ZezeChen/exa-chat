@@ -30,6 +30,16 @@ const answerSuggestions = {
   ],
 };
 
+const codeSuggestions = {
+  title: "Code Examples",
+  icon: <Icon icon="solar:code-bold" className="w-8 h-8 text-success" />,
+  items: [
+    "How to implement a debounce function in TypeScript?",
+    "Write a React hook for local storage",
+    "Create a REST API with Node.js and Express",
+  ],
+};
+
 const capabilities = {
   title: "Capabilities",
   icon: <Icon icon="solar:lightbulb-linear" className="w-8 h-8 text-warning" />,
@@ -40,8 +50,24 @@ const capabilities = {
   ],
 };
 
+const codeCapabilities = {
+  title: "Code Features",
+  icon: <Icon icon="solar:programming-linear" className="w-8 h-8 text-success" />,
+  items: [
+    "Get working code examples with explanations",
+    "Context-aware follow-up questions",
+    "Best practices and modern patterns",
+  ],
+};
+
 export function SuggestionCards({ mode, onSelect }: SuggestionCardsProps) {
-  const suggestions = mode === "search" ? searchSuggestions : answerSuggestions;
+  const suggestions = mode === "search" 
+    ? searchSuggestions 
+    : mode === "answer" 
+      ? answerSuggestions 
+      : codeSuggestions;
+  
+  const caps = mode === "code" ? codeCapabilities : capabilities;
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 w-full max-w-3xl">
@@ -65,11 +91,11 @@ export function SuggestionCards({ mode, onSelect }: SuggestionCardsProps) {
 
       <Card className="bg-content2" shadow="none">
         <CardHeader className="flex flex-col gap-2 px-4 pt-6 pb-4 items-center">
-          {capabilities.icon}
-          <p className="text-medium text-content2-foreground">{capabilities.title}</p>
+          {caps.icon}
+          <p className="text-medium text-content2-foreground">{caps.title}</p>
         </CardHeader>
         <CardBody className="flex flex-col gap-2">
-          {capabilities.items.map((item, index) => (
+          {caps.items.map((item, index) => (
             <div
               key={index}
               className="rounded-lg bg-content3 text-content3-foreground flex min-h-[50px] px-3 py-2"

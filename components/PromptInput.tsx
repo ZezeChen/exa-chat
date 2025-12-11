@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { Textarea, Button, Tooltip } from "@heroui/react";
 import { cn } from "@heroui/react";
 import { Icon } from "@iconify/react";
@@ -15,7 +15,7 @@ interface PromptInputProps {
   isLoading: boolean;
 }
 
-export function PromptInput({
+export const PromptInput = memo(function PromptInput({
   value,
   onValueChange,
   mode,
@@ -23,12 +23,12 @@ export function PromptInput({
   onSubmit,
   isLoading,
 }: PromptInputProps) {
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSubmit();
     }
-  };
+  }, [onSubmit]);
 
   return (
     <form 
@@ -49,7 +49,13 @@ export function PromptInput({
         }}
         minRows={2}
         maxRows={8}
-        placeholder={mode === "search" ? "Search anything..." : "Ask a question..."}
+        placeholder={
+          mode === "search" 
+            ? "Search anything..." 
+            : mode === "answer" 
+              ? "Ask a question..." 
+              : "Ask a coding question..."
+        }
         radius="lg"
         value={value}
         variant="flat"
@@ -87,7 +93,7 @@ export function PromptInput({
               Search
             </Button>
           </Tooltip>
-          <Tooltip showArrow content="Chat - Get AI answer">
+          <Tooltip showArrow content="Answer - Get AI answer">
             <Button
               size="sm"
               variant={mode === "answer" ? "flat" : "light"}
@@ -98,9 +104,20 @@ export function PromptInput({
               Answer
             </Button>
           </Tooltip>
+          <Tooltip showArrow content="Code - Programming assistant with context">
+            <Button
+              size="sm"
+              variant={mode === "code" ? "flat" : "light"}
+              color={mode === "code" ? "success" : "default"}
+              startContent={<Icon icon="solar:code-bold" className="w-4 h-4" />}
+              onPress={() => onModeChange("code")}
+            >
+              Code
+            </Button>
+          </Tooltip>
         </div>
         <p className="text-tiny text-default-400">{value.length}/2000</p>
       </div>
     </form>
   );
-}
+});

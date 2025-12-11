@@ -3,7 +3,7 @@
 import { Tabs, Tab } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
-export type SearchMode = "search" | "answer";
+export type SearchMode = "search" | "answer" | "code";
 
 interface SearchModeToggleProps {
   mode: SearchMode;
@@ -22,14 +22,14 @@ export function SearchModeToggle({ mode, onModeChange }: SearchModeToggleProps) 
       classNames={{
         tabList: "gap-2",
         cursor: "bg-primary",
-        tab: "px-4 h-9",
+        tab: "px-3 h-9",
         tabContent: "group-data-[selected=true]:text-primary-foreground",
       }}
     >
       <Tab
         key="search"
         title={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <Icon icon="solar:magnifer-linear" className="w-4 h-4" />
             <span>Search</span>
           </div>
@@ -38,9 +38,18 @@ export function SearchModeToggle({ mode, onModeChange }: SearchModeToggleProps) 
       <Tab
         key="answer"
         title={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <Icon icon="solar:chat-round-dots-linear" className="w-4 h-4" />
             <span>Answer</span>
+          </div>
+        }
+      />
+      <Tab
+        key="code"
+        title={
+          <div className="flex items-center gap-1.5">
+            <Icon icon="solar:code-bold" className="w-4 h-4" />
+            <span>Code</span>
           </div>
         }
       />

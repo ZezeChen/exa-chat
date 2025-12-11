@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Exa from "exa-js";
 import type { AnswerRequest, AnswerResponse, Citation } from "@/lib/types";
 
+export const runtime = "edge";
+
 const exa = new Exa(process.env.EXA_API_KEY);
 
 export async function POST(request: NextRequest) {
