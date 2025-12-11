@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Tooltip, Card, CardBody } from "@heroui/react";
-import { Search, Zap, ArrowUp } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { SearchMode } from "./SearchModeToggle";
 
 interface SearchBoxProps {
@@ -55,7 +55,7 @@ export function SearchBox({
                 onPress={() => onModeChange("search")}
                 className="w-8 h-8"
               >
-                <Search className="w-4 h-4" />
+                <Icon icon="solar:magnifer-linear" className="w-4 h-4" />
               </Button>
             </Tooltip>
             
@@ -68,7 +68,7 @@ export function SearchBox({
                 onPress={() => onModeChange("answer")}
                 className="w-8 h-8"
               >
-                <Zap className="w-4 h-4" />
+                <Icon icon="solar:bolt-linear" className="w-4 h-4" />
               </Button>
             </Tooltip>
           </div>
@@ -83,7 +83,7 @@ export function SearchBox({
             isDisabled={!query.trim()}
             className="w-9 h-9 rounded-lg"
           >
-            <ArrowUp className="w-5 h-5" />
+            <Icon icon="solar:arrow-up-linear" className="w-5 h-5" />
           </Button>
         </div>
       </CardBody>

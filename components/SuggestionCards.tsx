@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, CardBody, CardHeader } from "@heroui/react";
-import { Search, Zap, Lightbulb } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { SearchMode } from "./SearchModeToggle";
 
 interface SuggestionCardsProps {
@@ -12,7 +12,7 @@ interface SuggestionCardsProps {
 
 const searchSuggestions = {
   title: "Search Examples",
-  icon: <Search className="w-8 h-8 text-primary" />,
+  icon: <Icon icon="solar:magnifer-linear" className="w-8 h-8 text-primary" />,
   items: [
     "Latest AI news and developments",
     "React best practices 2024",
@@ -22,7 +22,7 @@ const searchSuggestions = {
 
 const answerSuggestions = {
   title: "Question Examples", 
-  icon: <Zap className="w-8 h-8 text-primary" />,
+  icon: <Icon icon="solar:bolt-linear" className="w-8 h-8 text-primary" />,
   items: [
     "What is machine learning?",
     "How does React work?",
@@ -32,7 +32,7 @@ const answerSuggestions = {
 
 const capabilities = {
   title: "Capabilities",
-  icon: <Lightbulb className="w-8 h-8 text-warning" />,
+  icon: <Icon icon="solar:lightbulb-linear" className="w-8 h-8 text-warning" />,
   items: [
     "Search the web with AI-powered results",
     "Get direct answers with citations",

@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, Avatar } from "@heroui/react";
-import { ExternalLink } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { Citation } from "@/lib/types";
 
 interface CitationListProps {
@@ -57,7 +57,7 @@ export function CitationList({ citations }: CitationListProps) {
             <span className="text-small text-default-700 group-hover:text-primary truncate flex-1">
               {citation.title || getDomain(citation.url)}
             </span>
-            <ExternalLink className="w-3.5 h-3.5 text-default-400 group-hover:text-primary flex-shrink-0" />
+            <Icon icon="solar:arrow-right-up-linear" className="w-3.5 h-3.5 text-default-400 group-hover:text-primary flex-shrink-0" />
           </Link>
         ))}
       </div>

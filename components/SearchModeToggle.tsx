@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, Tab } from "@heroui/react";
-import { Search, MessageCircle } from "lucide-react";
+import { Icon } from "@iconify/react";
 
 export type SearchMode = "search" | "answer";
 
@@ -30,7 +30,7 @@ export function SearchModeToggle({ mode, onModeChange }: SearchModeToggleProps) 
         key="search"
         title={
           <div className="flex items-center gap-2">
-            <Search className="w-4 h-4" />
+            <Icon icon="solar:magnifer-linear" className="w-4 h-4" />
             <span>Search</span>
           </div>
         }
@@ -39,7 +39,7 @@ export function SearchModeToggle({ mode, onModeChange }: SearchModeToggleProps) 
         key="answer"
         title={
           <div className="flex items-center gap-2">
-            <MessageCircle className="w-4 h-4" />
+            <Icon icon="solar:chat-round-dots-linear" className="w-4 h-4" />
             <span>Answer</span>
           </div>
         }

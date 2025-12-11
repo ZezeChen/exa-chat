@@ -8,7 +8,7 @@ import {
   Button,
 } from "@heroui/react";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Sparkles } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
 
 export function Header() {
@@ -23,7 +23,7 @@ export function Header() {
     <Navbar maxWidth="xl" isBordered>
       <NavbarBrand className="gap-2">
         <div className="p-1.5 rounded-lg bg-primary-100 dark:bg-primary-900/30">
-          <Sparkles className="w-5 h-5 text-primary" />
+          <Icon icon="solar:stars-bold" className="w-5 h-5 text-primary" />
         </div>
         <p className="font-bold text-lg text-foreground">Exa Search</p>
       </NavbarBrand>
@@ -39,9 +39,9 @@ export function Header() {
               aria-label="Toggle theme"
             >
               {theme === "dark" ? (
-                <Sun className="w-5 h-5" />
+                <Icon icon="solar:sun-linear" className="w-5 h-5" />
               ) : (
-                <Moon className="w-5 h-5" />
+                <Icon icon="solar:moon-linear" className="w-5 h-5" />
               )}
             </Button>
           )}

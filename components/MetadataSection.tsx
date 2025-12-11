@@ -1,7 +1,7 @@
 "use client";
 
 import { Chip } from "@heroui/react";
-import { Calendar, User } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { formatRelativeTime } from "@/lib/utils/date";
 
 interface MetadataSectionProps {
@@ -21,7 +21,7 @@ export function MetadataSection({ author, publishedDate }: MetadataSectionProps)
         <Chip
           size="sm"
           variant="flat"
-          startContent={<Calendar className="w-3 h-3" />}
+          startContent={<Icon icon="solar:calendar-linear" className="w-3 h-3" />}
           classNames={{
             base: "h-6 sm:h-7",
             content: "text-tiny sm:text-small px-1",
@@ -34,7 +34,7 @@ export function MetadataSection({ author, publishedDate }: MetadataSectionProps)
         <Chip
           size="sm"
           variant="flat"
-          startContent={<User className="w-3 h-3" />}
+          startContent={<Icon icon="solar:user-linear" className="w-3 h-3" />}
           classNames={{
             base: "h-6 sm:h-7",
             content: "max-w-[100px] sm:max-w-[120px] truncate text-tiny sm:text-small px-1",

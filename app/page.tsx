@@ -8,7 +8,7 @@ import {
   Button,
   Avatar,
 } from "@heroui/react";
-import { Sparkles, AlertCircle, Clock, Search } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { SearchResult as SearchResultType, SearchResponse, AnswerResponse } from "@/lib/types";
 import { SearchResultCard } from "@/components/SearchResultCard";
 import { Header } from "@/components/Header";
@@ -177,7 +177,7 @@ export default function Home() {
             <div className="flex w-full flex-col items-center justify-center gap-2">
               <Avatar
                 size="lg"
-                icon={<Sparkles className="w-6 h-6" />}
+                icon={<Icon icon="solar:stars-bold" className="w-6 h-6" />}
                 classNames={{
                   base: "bg-primary/10",
                   icon: "text-primary",
@@ -206,9 +206,9 @@ export default function Home() {
                     <Card className="max-w-[85%] bg-primary text-primary-foreground">
                       <CardBody className="p-3 flex flex-row items-center gap-2">
                         {message.mode === "search" ? (
-                          <Search className="w-4 h-4 shrink-0" />
+                          <Icon icon="solar:magnifer-linear" className="w-4 h-4 shrink-0" />
                         ) : (
-                          <Sparkles className="w-4 h-4 shrink-0" />
+                          <Icon icon="solar:stars-bold" className="w-4 h-4 shrink-0" />
                         )}
                         <p>{message.query}</p>
                       </CardBody>
@@ -230,7 +230,7 @@ export default function Home() {
                       <Card className="w-full">
                         <CardBody className="p-4">
                           <div className="flex items-center gap-2 text-danger mb-2">
-                            <AlertCircle className="w-4 h-4" />
+                            <Icon icon="solar:danger-circle-linear" className="w-4 h-4" />
                             <span className="font-medium">Error</span>
                           </div>
                           <p className="text-default-500">{message.error}</p>
@@ -256,7 +256,7 @@ export default function Home() {
                       <div className="w-full flex flex-col gap-3">
                         {message.autoprompt && (
                           <div className="flex items-center gap-2 text-small text-default-500">
-                            <Sparkles className="w-4 h-4 text-primary" />
+                            <Icon icon="solar:stars-bold" className="w-4 h-4 text-primary" />
                             <span>
                               Searched for:{" "}
                               <span className="text-foreground font-medium">
@@ -266,7 +266,7 @@ export default function Home() {
                           </div>
                         )}
                         <div className="flex items-center gap-2 text-small text-default-500">
-                          <Clock className="w-4 h-4" />
+                          <Icon icon="solar:clock-circle-linear" className="w-4 h-4" />
                           <span>Found {message.searchResults.length} results</span>
                         </div>
                         <div className="flex flex-col gap-3">

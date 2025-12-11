@@ -3,7 +3,7 @@
 import React from "react";
 import { Textarea, Button, Tooltip } from "@heroui/react";
 import { cn } from "@heroui/react";
-import { ArrowUp, Search, Zap } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { SearchMode } from "./SearchModeToggle";
 
 interface PromptInputProps {
@@ -68,7 +68,7 @@ export function PromptInput({
                 variant="solid"
                 type="submit"
               >
-                <ArrowUp className={cn("w-5 h-5", !value.trim() ? "text-default-600" : "text-primary-foreground")} />
+                <Icon icon="solar:arrow-up-linear" className={cn("w-5 h-5", !value.trim() ? "text-default-600" : "text-primary-foreground")} />
               </Button>
             </Tooltip>
           </div>
@@ -81,7 +81,7 @@ export function PromptInput({
               size="sm"
               variant={mode === "search" ? "flat" : "light"}
               color={mode === "search" ? "primary" : "default"}
-              startContent={<Search className="w-4 h-4" />}
+              startContent={<Icon icon="solar:magnifer-linear" className="w-4 h-4" />}
               onPress={() => onModeChange("search")}
             >
               Search
@@ -92,7 +92,7 @@ export function PromptInput({
               size="sm"
               variant={mode === "answer" ? "flat" : "light"}
               color={mode === "answer" ? "primary" : "default"}
-              startContent={<Zap className="w-4 h-4" />}
+              startContent={<Icon icon="solar:bolt-linear" className="w-4 h-4" />}
               onPress={() => onModeChange("answer")}
             >
               Answer

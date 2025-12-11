@@ -13,7 +13,7 @@ import {
   Avatar,
   Link,
 } from "@heroui/react";
-import { Sparkles, ChevronDown, ChevronUp, Search, Link2, ExternalLink } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { Citation } from "@/lib/types";
 import ReactMarkdown, { Components } from "react-markdown";
@@ -50,45 +50,45 @@ const markdownComponents: Components = {
       showAnchorIcon
       className="text-primary inline-flex items-center gap-0.5"
     >
-      {children}
+      {children as React.ReactNode}
     </Link>
   ),
   p: ({ children }) => (
-    <p className="text-default-700 leading-relaxed mb-3 last:mb-0">{children}</p>
+    <p className="text-default-700 leading-relaxed mb-3 last:mb-0">{children as React.ReactNode}</p>
   ),
   ul: ({ children }) => (
-    <ul className="text-default-700 list-disc pl-5 mb-3 space-y-1">{children}</ul>
+    <ul className="text-default-700 list-disc pl-5 mb-3 space-y-1">{children as React.ReactNode}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="text-default-700 list-decimal pl-5 mb-3 space-y-1">{children}</ol>
+    <ol className="text-default-700 list-decimal pl-5 mb-3 space-y-1">{children as React.ReactNode}</ol>
   ),
   li: ({ children }) => (
-    <li className="text-default-700">{children}</li>
+    <li className="text-default-700">{children as React.ReactNode}</li>
   ),
   strong: ({ children }) => (
-    <strong className="text-default-800 font-semibold">{children}</strong>
+    <strong className="text-default-800 font-semibold">{children as React.ReactNode}</strong>
   ),
   code: ({ children, className }) => {
     const isInline = !className;
     if (isInline) {
       return (
         <code className="text-primary bg-default-100 px-1.5 py-0.5 rounded text-sm">
-          {children}
+          {children as React.ReactNode}
         </code>
       );
     }
     return (
-      <code className={className}>{children}</code>
+      <code className={className}>{children as React.ReactNode}</code>
     );
   },
   pre: ({ children }) => (
     <pre className="bg-default-100 text-default-700 p-3 rounded-lg overflow-x-auto mb-3 text-sm">
-      {children}
+      {children as React.ReactNode}
     </pre>
   ),
   blockquote: ({ children }) => (
     <blockquote className="border-l-3 border-primary pl-4 italic text-default-600 mb-3">
-      {children}
+      {children as React.ReactNode}
     </blockquote>
   ),
 };
@@ -117,7 +117,7 @@ export function AnswerCard({
           <div className="flex items-center gap-2">
             <Avatar
               size="sm"
-              icon={<Sparkles className="w-4 h-4" />}
+              icon={<Icon icon="solar:stars-bold" className="w-4 h-4" />}
               classNames={{
                 base: "bg-primary/10 w-7 h-7",
                 icon: "text-primary",
@@ -145,9 +145,9 @@ export function AnswerCard({
               onPress={() => setIsExpanded(!isExpanded)}
               endContent={
                 isExpanded ? (
-                  <ChevronUp className="w-4 h-4" />
+                  <Icon icon="solar:alt-arrow-up-linear" className="w-4 h-4" />
                 ) : (
-                  <ChevronDown className="w-4 h-4" />
+                  <Icon icon="solar:alt-arrow-down-linear" className="w-4 h-4" />
                 )
               }
             >
@@ -165,7 +165,7 @@ export function AnswerCard({
                     <Button
                       size="sm"
                       variant="flat"
-                      startContent={<Link2 className="w-3.5 h-3.5" />}
+                      startContent={<Icon icon="solar:link-linear" className="w-3.5 h-3.5" />}
                       className="text-default-500"
                     >
                       {citations.length} sources
@@ -194,7 +194,7 @@ export function AnswerCard({
                             />
                           }
                           endContent={
-                            <ExternalLink className="w-3.5 h-3.5 text-default-400 shrink-0" />
+                            <Icon icon="solar:arrow-right-up-linear" className="w-3.5 h-3.5 text-default-400 shrink-0" />
                           }
                           description={getDomain(citation.url)}
                         >
@@ -210,7 +210,7 @@ export function AnswerCard({
                 variant="light"
                 color="default"
                 size="sm"
-                startContent={<Search className="w-3.5 h-3.5" />}
+                startContent={<Icon icon="solar:magnifer-linear" className="w-3.5 h-3.5" />}
                 onPress={onViewSearchResults}
                 className="text-default-500"
               >

@@ -9,7 +9,7 @@ import {
   Button,
   Avatar,
 } from "@heroui/react";
-import { ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { SearchResult } from "@/lib/types";
 import { motion } from "framer-motion";
 import { RelevanceIndicator } from "./RelevanceIndicator";
@@ -107,7 +107,7 @@ export function SearchResultCard({ result, index }: SearchResultCardProps) {
                 href={result.url}
                 isExternal
                 showAnchorIcon
-                anchorIcon={<ExternalLink className="w-3.5 h-3.5 ml-1" />}
+                anchorIcon={<Icon icon="solar:arrow-right-up-linear" className="w-3.5 h-3.5 ml-1" />}
                 className="text-foreground hover:text-primary transition-colors"
               >
                 <h3 className="text-base sm:text-lg font-semibold line-clamp-2">
@@ -155,9 +155,9 @@ export function SearchResultCard({ result, index }: SearchResultCardProps) {
                   onPress={() => setIsExpanded(!isExpanded)}
                   endContent={
                     isExpanded ? (
-                      <ChevronUp className="w-4 h-4" />
+                      <Icon icon="solar:alt-arrow-up-linear" className="w-4 h-4" />
                     ) : (
-                      <ChevronDown className="w-4 h-4" />
+                      <Icon icon="solar:alt-arrow-down-linear" className="w-4 h-4" />
                     )
                   }
                 >
