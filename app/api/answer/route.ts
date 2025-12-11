@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Handle empty answer
-    if (!answerResponse.answer || answerResponse.answer.trim().length === 0) {
+    const answerText = answerResponse.answer as string | undefined;
+    if (!answerText || answerText.trim().length === 0) {
       return NextResponse.json(
         { error: "Unable to generate an answer. Please try a different question." },
         { status: 404 }
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
     }));
 
     const response: AnswerResponse = {
-      answer: answerResponse.answer,
+      answer: answerText,
       citations,
     };
 

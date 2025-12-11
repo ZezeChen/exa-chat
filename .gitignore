@@ -24,3 +24,7 @@ dist-ssr
 .next/
 .kiro/
 .bolt/
+
+# OpenNext / Cloudflare Workers
+.open-next/
+.wrangler/
