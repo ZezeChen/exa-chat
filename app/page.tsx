@@ -1,49 +1,69 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import {
-  Input,
-  Button,
-  Chip,
   Spinner,
   Card,
   CardBody,
-  Divider,
+  Button,
+  Avatar,
 } from "@heroui/react";
-import { Search, Sparkles, AlertCircle, Clock } from "lucide-react";
+import { Sparkles, AlertCircle, Clock, Search } from "lucide-react";
 import { SearchResult as SearchResultType, SearchResponse, AnswerResponse } from "@/lib/types";
 import { SearchResultCard } from "@/components/SearchResultCard";
 import { Header } from "@/components/Header";
-import { EmptyState } from "@/components/EmptyState";
-import { SearchModeToggle, SearchMode } from "@/components/SearchModeToggle";
+import { SearchMode } from "@/components/SearchModeToggle";
 import { AnswerCard } from "@/components/AnswerCard";
+import { PromptInput } from "@/components/PromptInput";
+import { SuggestionCards } from "@/components/SuggestionCards";
+
+interface Message {
+  id: string;
+  query: string;
+  mode: SearchMode;
+  searchResults?: SearchResultType[];
+  autoprompt?: string;
+  answer?: AnswerResponse;
+  error: string | null;
+  isLoading: boolean;
+}
 
 export default function Home() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResultType[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [autoprompt, setAutoprompt] = useState<string | null>(null);
-  
-  // Answer mode state
   const [mode, setMode] = useState<SearchMode>("search");
-  const [answerData, setAnswerData] = useState<AnswerResponse | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  const handleSearch = useCallback(async (searchQuery?: string) => {
-    const q = searchQuery || query;
-    if (!q.trim()) return;
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+    }
+  }, [messages]);
 
+  const handleModeChange = useCallback((newMode: SearchMode) => {
+    setMode(newMode);
+  }, []);
+
+  const handleSearch = useCallback(async (searchQuery: string) => {
+    const messageId = crypto.randomUUID();
+    const newMessage: Message = {
+      id: messageId,
+      query: searchQuery,
+      mode: "search",
+      error: null,
+      isLoading: true,
+    };
+
+    setMessages(prev => [...prev, newMessage]);
+    setQuery("");
     setIsLoading(true);
-    setError(null);
-    setHasSearched(true);
-    setAnswerData(null);
 
     try {
       const response = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q, numResults: 10 }),
+        body: JSON.stringify({ query: searchQuery, numResults: 10 }),
       });
 
       if (!response.ok) {
@@ -52,30 +72,51 @@ export default function Home() {
       }
 
       const data: SearchResponse = await response.json();
-      setResults(data.results);
-      setAutoprompt(data.autopromptString || null);
+      
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === messageId 
+            ? { 
+                ...msg, 
+                searchResults: data.results, 
+                autoprompt: data.autopromptString,
+                isLoading: false 
+              }
+            : msg
+        )
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      setResults([]);
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === messageId 
+            ? { ...msg, error: err instanceof Error ? err.message : "An error occurred", isLoading: false }
+            : msg
+        )
+      );
     } finally {
       setIsLoading(false);
     }
-  }, [query]);
+  }, []);
 
-  const handleAnswer = useCallback(async () => {
-    if (!query.trim()) return;
+  const handleAnswer = useCallback(async (answerQuery: string) => {
+    const messageId = crypto.randomUUID();
+    const newMessage: Message = {
+      id: messageId,
+      query: answerQuery,
+      mode: "answer",
+      error: null,
+      isLoading: true,
+    };
 
+    setMessages(prev => [...prev, newMessage]);
+    setQuery("");
     setIsLoading(true);
-    setError(null);
-    setHasSearched(true);
-    setResults([]);
-    setAutoprompt(null);
 
     try {
       const response = await fetch("/api/answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query: answerQuery }),
       });
 
       if (!response.ok) {
@@ -84,269 +125,191 @@ export default function Home() {
       }
 
       const data: AnswerResponse = await response.json();
-      setAnswerData(data);
+      
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === messageId 
+            ? { ...msg, answer: data, isLoading: false }
+            : msg
+        )
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      setAnswerData(null);
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === messageId 
+            ? { ...msg, error: err instanceof Error ? err.message : "An error occurred", isLoading: false }
+            : msg
+        )
+      );
     } finally {
       setIsLoading(false);
     }
-  }, [query]);
+  }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      if (mode === "search") {
-        handleSearch();
-      } else {
-        handleAnswer();
-      }
+  const handleSubmit = useCallback(() => {
+    if (!query.trim()) return;
+    if (mode === "search") {
+      handleSearch(query);
+    } else {
+      handleAnswer(query);
     }
-  };
+  }, [mode, query, handleSearch, handleAnswer]);
 
-  const handleViewSearchResults = useCallback(() => {
+  const handleSuggestionSelect = useCallback((suggestion: string) => {
+    setQuery(suggestion);
+  }, []);
+
+  const handleViewSearchResults = useCallback((searchQuery: string) => {
     setMode("search");
-    handleSearch(query);
-  }, [query, handleSearch]);
+    handleSearch(searchQuery);
+  }, [handleSearch]);
 
-  const searchSuggestions = [
-    "Latest AI news",
-    "React best practices",
-    "Climate change solutions",
-  ];
-
-  const answerSuggestions = [
-    "What is machine learning?",
-    "How does React work?",
-    "Why is the sky blue?",
-  ];
-
-  const suggestions = mode === "search" ? searchSuggestions : answerSuggestions;
+  const hasMessages = messages.length > 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="h-dvh flex flex-col bg-background">
       <Header />
-
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {!hasSearched ? (
-          <div className="flex flex-col items-center justify-center min-h-[65vh] gap-8">
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-4 rounded-2xl bg-primary/10">
-                <Sparkles className="w-12 h-12 text-primary" />
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-center">
-                <span className="text-primary">Exa</span>{" "}
-                <span className="text-foreground">Search</span>
+      
+      <main className="flex-1 flex flex-col w-full max-w-4xl mx-auto overflow-hidden">
+        {!hasMessages ? (
+          // Initial state - centered content
+          <div className="flex-1 flex flex-col justify-center gap-8 px-4 sm:px-6 py-6">
+            <div className="flex w-full flex-col items-center justify-center gap-2">
+              <Avatar
+                size="lg"
+                icon={<Sparkles className="w-6 h-6" />}
+                classNames={{
+                  base: "bg-primary/10",
+                  icon: "text-primary",
+                }}
+              />
+              <h1 className="text-xl font-medium text-default-700">
+                {mode === "search" ? "What would you like to search?" : "What would you like to know?"}
               </h1>
-              <p className="text-default-500 text-base sm:text-lg text-center max-w-md">
-                AI-powered search engine that finds exactly what you need
-              </p>
             </div>
-
-            <Card className="w-full max-w-2xl" shadow="lg">
-              <CardBody className="p-5 sm:p-6 gap-4">
-                <div className="flex justify-center">
-                  <SearchModeToggle mode={mode} onModeChange={setMode} />
-                </div>
-                <div className="flex flex-row gap-3 items-center">
-                  <Input
-                    value={query}
-                    onValueChange={setQuery}
-                    onKeyDown={handleKeyDown}
-                    placeholder={mode === "search" ? "Search anything..." : "Ask a question..."}
-                    radius="lg"
-                    size="lg"
-                    isClearable
-                    onClear={() => setQuery("")}
-                    startContent={
-                      <Search className="w-5 h-5 text-default-400 shrink-0" />
-                    }
-                  />
-                  <Button
-                    color="primary"
-                    size="lg"
-                    radius="lg"
-                    className="font-semibold px-8 h-12 shrink-0"
-                    onPress={() => mode === "search" ? handleSearch() : handleAnswer()}
-                    isLoading={isLoading}
-                  >
-                    {mode === "search" ? "Search" : "Ask"}
-                  </Button>
-                </div>
-
-                <Divider />
-
-                <div className="flex flex-wrap gap-2 justify-center items-center">
-                  <span className="text-small text-default-400">Try:</span>
-                  {suggestions.map((suggestion) => (
-                    <Chip
-                      key={suggestion}
-                      variant="flat"
-                      color="default"
-                      className="cursor-pointer"
-                      onClick={() => setQuery(suggestion)}
-                    >
-                      {suggestion}
-                    </Chip>
-                  ))}
-                </div>
-              </CardBody>
-            </Card>
+            
+            <div className="flex justify-center">
+              <SuggestionCards mode={mode} onSelect={handleSuggestionSelect} />
+            </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
-            <Card shadow="md">
-              <CardBody className="p-4 gap-3">
-                <div className="flex justify-center">
-                  <SearchModeToggle mode={mode} onModeChange={setMode} />
-                </div>
-                <div className="flex flex-row gap-3 items-center">
-                  <Input
-                    value={query}
-                    onValueChange={setQuery}
-                    onKeyDown={handleKeyDown}
-                    placeholder={mode === "search" ? "Search anything..." : "Ask a question..."}
-                    radius="lg"
-                    size="md"
-                    isClearable
-                    onClear={() => setQuery("")}
-                    classNames={{
-                      base: "flex-1",
-                    }}
-                    startContent={
-                      <Search className="w-4 h-4 text-default-400 shrink-0" />
-                    }
-                  />
-                  <Button
-                    color="primary"
-                    size="lg"
-                    radius="lg"
-                    className="font-semibold px-6 h-10 shrink-0"
-                    onPress={() => mode === "search" ? handleSearch() : handleAnswer()}
-                    isLoading={isLoading}
-                  >
-                    {mode === "search" ? "Search" : "Ask"}
-                  </Button>
-                </div>
-              </CardBody>
-            </Card>
-
-            {autoprompt && (
-              <div className="flex items-center gap-2 text-small text-default-500 px-1">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <span>
-                  Searched for:{" "}
-                  <span className="text-foreground font-medium">
-                    {autoprompt}
-                  </span>
-                </span>
-              </div>
-            )}
-
-            {isLoading ? (
-              <Card>
-                <CardBody className="flex flex-col items-center justify-center py-20 gap-4">
-                  <Spinner size="lg" color="primary" />
-                  <p className="text-default-500">
-                    {mode === "search" ? "Searching the web..." : "Getting answer..."}
-                  </p>
-                </CardBody>
-              </Card>
-            ) : error ? (
-              <Card>
-                <CardBody className="flex flex-col items-center justify-center py-20 gap-4">
-                  <div className="p-4 rounded-full bg-danger/10">
-                    <AlertCircle className="w-8 h-8 text-danger" />
+          // Chat view - messages
+          <div 
+            ref={contentRef}
+            className="flex-1 overflow-y-auto px-4 sm:px-6 py-6"
+          >
+            <div className="flex flex-col gap-8">
+              {messages.map((message) => (
+                <div key={message.id} className="flex flex-col gap-4">
+                  {/* User query */}
+                  <div className="flex justify-end">
+                    <Card className="max-w-[85%] bg-primary text-primary-foreground">
+                      <CardBody className="p-3 flex flex-row items-center gap-2">
+                        {message.mode === "search" ? (
+                          <Search className="w-4 h-4 shrink-0" />
+                        ) : (
+                          <Sparkles className="w-4 h-4 shrink-0" />
+                        )}
+                        <p>{message.query}</p>
+                      </CardBody>
+                    </Card>
                   </div>
-                  <div className="text-center">
-                    <h3 className="text-xl font-semibold text-danger mb-2">
-                      {mode === "search" ? "Search Error" : "Answer Error"}
-                    </h3>
-                    <p className="text-default-500 mb-4">{error}</p>
-                    <div className="flex gap-3 justify-center flex-wrap">
-                      <Button
-                        color="primary"
-                        variant="flat"
-                        onPress={() => mode === "search" ? handleSearch() : handleAnswer()}
-                      >
-                        Try Again
-                      </Button>
-                      {mode === "answer" && (
-                        <Button
-                          color="default"
-                          variant="flat"
-                          startContent={<Search className="w-4 h-4" />}
-                          onPress={handleViewSearchResults}
-                        >
-                          View Search Results
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            ) : mode === "answer" && answerData ? (
-              answerData.answer && answerData.answer.trim() ? (
-                <AnswerCard
-                  answer={answerData.answer}
-                  citations={answerData.citations}
-                  onViewSearchResults={handleViewSearchResults}
-                />
-              ) : (
-                <Card>
-                  <CardBody className="flex flex-col items-center justify-center py-20 gap-4">
-                    <div className="p-4 rounded-full bg-warning/10">
-                      <Sparkles className="w-8 h-8 text-warning" />
-                    </div>
-                    <div className="text-center">
-                      <h3 className="text-xl font-semibold text-foreground mb-2">
-                        No Answer Available
-                      </h3>
-                      <p className="text-default-500 mb-4">
-                        Unable to generate an answer for this question. Try rephrasing or ask a different question.
-                      </p>
-                      <div className="flex gap-3 justify-center">
-                        <Button
-                          color="primary"
-                          variant="flat"
-                          onPress={handleAnswer}
-                        >
-                          Try Again
-                        </Button>
-                        <Button
-                          color="default"
-                          variant="flat"
-                          startContent={<Search className="w-4 h-4" />}
-                          onPress={handleViewSearchResults}
-                        >
-                          View Search Results
-                        </Button>
+                  
+                  {/* Response */}
+                  <div className="flex justify-start w-full">
+                    {message.isLoading ? (
+                      <Card className="w-full">
+                        <CardBody className="flex flex-row items-center gap-3 p-4">
+                          <Spinner size="sm" color="primary" />
+                          <p className="text-default-500">
+                            {message.mode === "search" ? "Searching the web..." : "Thinking..."}
+                          </p>
+                        </CardBody>
+                      </Card>
+                    ) : message.error ? (
+                      <Card className="w-full">
+                        <CardBody className="p-4">
+                          <div className="flex items-center gap-2 text-danger mb-2">
+                            <AlertCircle className="w-4 h-4" />
+                            <span className="font-medium">Error</span>
+                          </div>
+                          <p className="text-default-500">{message.error}</p>
+                          <Button
+                            size="sm"
+                            color="primary"
+                            variant="flat"
+                            className="mt-3"
+                            onPress={() => {
+                              if (message.mode === "search") {
+                                handleSearch(message.query);
+                              } else {
+                                handleAnswer(message.query);
+                              }
+                            }}
+                          >
+                            Try Again
+                          </Button>
+                        </CardBody>
+                      </Card>
+                    ) : message.mode === "search" && message.searchResults ? (
+                      // Search results
+                      <div className="w-full flex flex-col gap-3">
+                        {message.autoprompt && (
+                          <div className="flex items-center gap-2 text-small text-default-500">
+                            <Sparkles className="w-4 h-4 text-primary" />
+                            <span>
+                              Searched for:{" "}
+                              <span className="text-foreground font-medium">
+                                {message.autoprompt}
+                              </span>
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 text-small text-default-500">
+                          <Clock className="w-4 h-4" />
+                          <span>Found {message.searchResults.length} results</span>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          {message.searchResults.map((result, index) => (
+                            <SearchResultCard
+                              key={result.id}
+                              result={result}
+                              index={index}
+                            />
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              )
-            ) : mode === "search" && results.length === 0 ? (
-              <EmptyState query={query} />
-            ) : mode === "search" && results.length > 0 ? (
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-2 text-small text-default-500 px-1">
-                  <Clock className="w-4 h-4" />
-                  <span>Found {results.length} results</span>
+                    ) : message.mode === "answer" && message.answer ? (
+                      // AI Answer
+                      <AnswerCard
+                        answer={message.answer.answer}
+                        citations={message.answer.citations}
+                        onViewSearchResults={() => handleViewSearchResults(message.query)}
+                      />
+                    ) : null}
+                  </div>
                 </div>
-
-                <div className="flex flex-col gap-3">
-                  {results.map((result, index) => (
-                    <SearchResultCard
-                      key={result.id}
-                      result={result}
-                      index={index}
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : null}
+              ))}
+            </div>
           </div>
         )}
+        
+        {/* Input area - always at bottom */}
+        <div className="bg-background px-4 sm:px-6 py-4">
+          <div className="flex flex-col gap-2">
+            <PromptInput
+              value={query}
+              onValueChange={setQuery}
+              mode={mode}
+              onModeChange={handleModeChange}
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+            />
+            <p className="text-tiny text-default-400 px-2">
+              Powered by Exa AI. Results may vary.
+            </p>
+          </div>
+        </div>
       </main>
     </div>
   );

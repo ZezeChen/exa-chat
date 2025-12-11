@@ -1,11 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardBody, Button, Divider } from "@heroui/react";
-import { Sparkles, ChevronDown, ChevronUp, Search } from "lucide-react";
+import {
+  Card,
+  CardBody,
+  Button,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Listbox,
+  ListboxItem,
+  Avatar,
+  Link,
+} from "@heroui/react";
+import { Sparkles, ChevronDown, ChevronUp, Search, Link2, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 import { Citation } from "@/lib/types";
-import { CitationList } from "./CitationList";
+import ReactMarkdown, { Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface AnswerCardProps {
   answer: string;
@@ -13,7 +25,73 @@ interface AnswerCardProps {
   onViewSearchResults: () => void;
 }
 
-const COLLAPSE_THRESHOLD = 500;
+const COLLAPSE_THRESHOLD = 800;
+
+function getDomain(url: string): string {
+  try {
+    const domain = new URL(url).hostname;
+    return domain.replace("www.", "");
+  } catch {
+    return url;
+  }
+}
+
+function getFaviconUrl(url: string): string {
+  const domain = getDomain(url);
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+}
+
+// Custom Markdown components
+const markdownComponents: Components = {
+  a: ({ href, children }) => (
+    <Link
+      href={href}
+      isExternal
+      showAnchorIcon
+      className="text-primary inline-flex items-center gap-0.5"
+    >
+      {children}
+    </Link>
+  ),
+  p: ({ children }) => (
+    <p className="text-default-700 leading-relaxed mb-3 last:mb-0">{children}</p>
+  ),
+  ul: ({ children }) => (
+    <ul className="text-default-700 list-disc pl-5 mb-3 space-y-1">{children}</ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="text-default-700 list-decimal pl-5 mb-3 space-y-1">{children}</ol>
+  ),
+  li: ({ children }) => (
+    <li className="text-default-700">{children}</li>
+  ),
+  strong: ({ children }) => (
+    <strong className="text-default-800 font-semibold">{children}</strong>
+  ),
+  code: ({ children, className }) => {
+    const isInline = !className;
+    if (isInline) {
+      return (
+        <code className="text-primary bg-default-100 px-1.5 py-0.5 rounded text-sm">
+          {children}
+        </code>
+      );
+    }
+    return (
+      <code className={className}>{children}</code>
+    );
+  },
+  pre: ({ children }) => (
+    <pre className="bg-default-100 text-default-700 p-3 rounded-lg overflow-x-auto mb-3 text-sm">
+      {children}
+    </pre>
+  ),
+  blockquote: ({ children }) => (
+    <blockquote className="border-l-3 border-primary pl-4 italic text-default-600 mb-3">
+      {children}
+    </blockquote>
+  ),
+};
 
 export function AnswerCard({
   answer,
@@ -28,29 +106,34 @@ export function AnswerCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.2 }}
+      className="w-full"
     >
-      <Card className="w-full border border-primary/20" shadow="md">
-        <CardBody className="p-4 sm:p-6 gap-4">
+      <Card className="w-full" shadow="sm">
+        <CardBody className="p-4 gap-3">
           {/* AI Indicator Header */}
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-primary/10">
-              <Sparkles className="w-4 h-4 text-primary" />
-            </div>
-            <span className="text-small font-medium text-primary">AI Answer</span>
+            <Avatar
+              size="sm"
+              icon={<Sparkles className="w-4 h-4" />}
+              classNames={{
+                base: "bg-primary/10 w-7 h-7",
+                icon: "text-primary",
+              }}
+            />
+            <span className="text-small font-medium text-default-600">Exa AI</span>
           </div>
 
-          {/* Answer Text */}
+          {/* Answer Text with Markdown */}
           <div className="prose prose-sm max-w-none">
-            {displayedAnswer.split("\n").map((paragraph, index) => (
-              paragraph.trim() && (
-                <p key={index} className="text-default-700 mb-2 last:mb-0">
-                  {paragraph}
-                </p>
-              )
-            ))}
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={markdownComponents}
+            >
+              {displayedAnswer}
+            </ReactMarkdown>
           </div>
 
           {/* Expand/Collapse for long answers */}
@@ -58,7 +141,7 @@ export function AnswerCard({
             <Button
               size="sm"
               variant="light"
-              className="self-start"
+              className="self-start -mt-1"
               onPress={() => setIsExpanded(!isExpanded)}
               endContent={
                 isExpanded ? (
@@ -72,28 +155,68 @@ export function AnswerCard({
             </Button>
           )}
 
-          {/* Citations */}
-          {citations && citations.length > 0 && (
-            <>
-              <Divider />
-              <CitationList citations={citations} />
-            </>
-          )}
-
-          <Divider />
-
-          {/* Footer with actions and attribution */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <Button
-              variant="flat"
-              color="default"
-              size="sm"
-              startContent={<Search className="w-4 h-4" />}
-              onPress={onViewSearchResults}
-            >
-              View search results
-            </Button>
-            <span className="text-tiny text-default-400">Powered by Exa</span>
+          {/* Footer */}
+          <div className="flex items-center justify-between pt-2 border-t border-default-100">
+            <div className="flex items-center gap-2">
+              {/* Sources Popover */}
+              {citations && citations.length > 0 && (
+                <Popover placement="top-start" showArrow>
+                  <PopoverTrigger>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      startContent={<Link2 className="w-3.5 h-3.5" />}
+                      className="text-default-500"
+                    >
+                      {citations.length} sources
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0 w-80">
+                    <Listbox
+                      aria-label="Sources"
+                      className="p-2"
+                      itemClasses={{
+                        base: "px-3 py-2 rounded-lg data-[hover=true]:bg-default-100",
+                      }}
+                    >
+                      {citations.map((citation) => (
+                        <ListboxItem
+                          key={citation.id}
+                          href={citation.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          startContent={
+                            <Avatar
+                              size="sm"
+                              src={getFaviconUrl(citation.url)}
+                              className="w-5 h-5 shrink-0"
+                              radius="sm"
+                            />
+                          }
+                          endContent={
+                            <ExternalLink className="w-3.5 h-3.5 text-default-400 shrink-0" />
+                          }
+                          description={getDomain(citation.url)}
+                        >
+                          <span className="line-clamp-1">{citation.title}</span>
+                        </ListboxItem>
+                      ))}
+                    </Listbox>
+                  </PopoverContent>
+                </Popover>
+              )}
+              
+              <Button
+                variant="light"
+                color="default"
+                size="sm"
+                startContent={<Search className="w-3.5 h-3.5" />}
+                onPress={onViewSearchResults}
+                className="text-default-500"
+              >
+                Search
+              </Button>
+            </div>
           </div>
         </CardBody>
       </Card>
