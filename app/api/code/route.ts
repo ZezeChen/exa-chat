@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { exaAnswer } from "@/lib/exa-client";
 import type { CodeRequest, CodeResponse, Citation, CodeMessage } from "@/lib/types";
 
-export const runtime = "edge";
-
 function buildConversationContext(history: CodeMessage[]): string {
   if (!history || history.length === 0) return "";
   const recentHistory = history.slice(-6);

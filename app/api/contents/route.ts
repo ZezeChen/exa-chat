@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exaGetContents } from "@/lib/exa-client";
 
-export const runtime = "edge";
-
 export interface ContentsRequest {
   ids: string[];
 }

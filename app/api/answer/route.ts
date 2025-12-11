@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { exaAnswer } from "@/lib/exa-client";
 import type { AnswerRequest, AnswerResponse, Citation } from "@/lib/types";
 
-export const runtime = "edge";
-
 export async function POST(request: NextRequest) {
   try {
     const body: AnswerRequest = await request.json();

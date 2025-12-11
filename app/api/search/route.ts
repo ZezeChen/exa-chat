@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { exaSearch } from "@/lib/exa-client";
 import type { SearchRequest, SearchResponse, SearchResult } from "@/lib/types";
 
-export const runtime = "edge";
-
 export async function POST(request: NextRequest) {
   try {
     const body: SearchRequest = await request.json();
