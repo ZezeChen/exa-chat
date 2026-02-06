@@ -9,9 +9,8 @@
 - 🔍 **智能搜索** - 使用 Exa API 进行 AI 驱动的网页搜索，支持关键词高亮
 - 💬 **AI 问答** - 直接获取 AI 生成的答案，附带引用来源
 - 📚 **深度研究** - 使用 Exa Research API 进行深度主题研究，生成详细报告
-- 📱 **响应式设计** - 完美适配桌面和移动设备
 - ⚡ **极速部署** - 一键部署到 Vercel
-- 🖼️ **代码高亮** - 支持多语言代码语法高亮
+
 
 ## 🛠️ 技术栈
 
@@ -29,9 +28,18 @@
 
 点击下方按钮，一键部署到 Vercel：
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CoolkHz/exa-chat&env=EXA_API_KEY&envDescription=Exa%20API%20Key%20for%20search%20functionality&envLink=https://exa.ai)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ZezeChen/exa-chat)
 
-部署时会提示你输入 `EXA_API_KEY`，填入你的 Exa API Key 即可。
+
+部署时需要添加环境变量
+
+| 变量名 | 描述 | 必填 | 默认值 |
+|--------|------|------|--------|
+| `EXA_API_KEY` | Exa API 密钥 | ✅ | - |
+| `EXA_API_BASE` | Exa API 基础 URL | ❌ | `https://api.exa.ai` |
+
+
+
 
 ### 本地开发
 
@@ -46,7 +54,7 @@
 1. 克隆项目
 
 ```bash
-git clone https://github.com/CoolkHz/exa-chat.git
+git clone https://github.com/ZezeChen/exa-chat.git
 cd exa-chat
 ```
 
@@ -99,12 +107,6 @@ exa-chat/
     └── types.ts               # 类型定义
 ```
 
-## 🔑 环境变量
-
-| 变量名 | 描述 | 必填 | 默认值 |
-|--------|------|------|--------|
-| `EXA_API_KEY` | Exa API 密钥 | ✅ | - |
-| `EXA_API_BASE` | Exa API 基础 URL | ❌ | `https://api.exa.ai` |
 
 ## 📝 使用说明
 

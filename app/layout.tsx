@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Exa Search - AI-Powered Search Engine",
   description: "Search the web with AI-powered results from Exa",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
