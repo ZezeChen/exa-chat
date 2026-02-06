@@ -54,7 +54,7 @@ export const PromptInput = memo(function PromptInput({
             ? "Search anything..." 
             : mode === "answer" 
               ? "Ask a question..." 
-              : "Ask a coding question..."
+              : "Enter a topic for deep research..."
         }
         radius="lg"
         value={value}
@@ -104,15 +104,15 @@ export const PromptInput = memo(function PromptInput({
               Answer
             </Button>
           </Tooltip>
-          <Tooltip showArrow content="Code - Programming assistant with context">
+          <Tooltip showArrow content="Research - Deep research with citations">
             <Button
               size="sm"
-              variant={mode === "code" ? "flat" : "light"}
-              color={mode === "code" ? "success" : "default"}
-              startContent={<Icon icon="solar:code-bold" className="w-4 h-4" />}
-              onPress={() => onModeChange("code")}
+              variant={mode === "research" ? "flat" : "light"}
+              color={mode === "research" ? "secondary" : "default"}
+              startContent={<Icon icon="solar:document-text-linear" className="w-4 h-4" />}
+              onPress={() => onModeChange("research")}
             >
-              Code
+              Research
             </Button>
           </Tooltip>
         </div>

@@ -46,18 +46,24 @@ export interface AnswerRequest {
   query: string;
 }
 
-// Code Mode Types (with context support)
-export interface CodeMessage {
-  role: "user" | "assistant";
-  content: string;
+// Research Mode Types
+export interface ResearchCitation {
+  title: string;
+  url: string;
 }
 
-export interface CodeRequest {
-  query: string;
-  conversationHistory?: CodeMessage[];
+export interface ResearchCost {
+  total: number;
+  numPages: number;
+  numSearches: number;
 }
 
-export interface CodeResponse {
-  answer: string;
-  citations: Citation[];
+export interface ResearchResponse {
+  status: string;
+  taskId?: string;
+  output?: {
+    content: string;
+  };
+  citations?: ResearchCitation[];
+  costDollars?: ResearchCost;
 }

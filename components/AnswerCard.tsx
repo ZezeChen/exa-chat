@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, memo, useMemo } from "react";
+import { memo, useMemo } from "react";
 import {
   Card,
   CardBody,
@@ -13,14 +13,13 @@ import {
   Avatar,
   Link,
 } from "@heroui/react";
-import { useTheme } from "next-themes";
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { Citation } from "@/lib/types";
 import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 interface AnswerCardProps {
   answer: string;
@@ -28,8 +27,6 @@ interface AnswerCardProps {
   onViewSearchResults: () => void;
   isCodeMode?: boolean;
 }
-
-const COLLAPSE_THRESHOLD = 800;
 
 function getDomain(url: string): string {
   try {
@@ -45,8 +42,8 @@ function getFaviconUrl(url: string): string {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
 }
 
-// Create markdown components with theme-aware code highlighting
-function createMarkdownComponents(isDark: boolean): Components {
+// Create markdown components with code highlighting
+function createMarkdownComponents(): Components {
   return {
     a: ({ href, children }) => (
       <Link
@@ -80,7 +77,7 @@ function createMarkdownComponents(isDark: boolean): Components {
       if (match) {
         return (
           <SyntaxHighlighter
-            style={(isDark ? oneDark : oneLight) as { [key: string]: React.CSSProperties }}
+            style={oneLight as { [key: string]: React.CSSProperties }}
             language={match[1]}
             PreTag="div"
             className="rounded-lg text-sm my-3"
@@ -133,15 +130,7 @@ export const AnswerCard = memo(function AnswerCard({
   onViewSearchResults,
   isCodeMode = false,
 }: AnswerCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-  const markdownComponents = useMemo(() => createMarkdownComponents(isDark), [isDark]);
-  
-  const isLongAnswer = answer.length > COLLAPSE_THRESHOLD;
-  const displayedAnswer = isExpanded || !isLongAnswer 
-    ? answer 
-    : answer.slice(0, COLLAPSE_THRESHOLD) + "...";
+  const markdownComponents = useMemo(() => createMarkdownComponents(), []);
 
   return (
     <motion.div
@@ -167,34 +156,15 @@ export const AnswerCard = memo(function AnswerCard({
             </span>
           </div>
 
-          {/* Answer Text with Markdown */}
+          {/* Answer Text with Markdown - 直接显示全部内容 */}
           <div className="prose prose-sm max-w-none">
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]}
               components={markdownComponents}
             >
-              {displayedAnswer}
+              {answer}
             </ReactMarkdown>
           </div>
-
-          {/* Expand/Collapse for long answers */}
-          {isLongAnswer && (
-            <Button
-              size="sm"
-              variant="light"
-              className="self-start -mt-1"
-              onPress={() => setIsExpanded(!isExpanded)}
-              endContent={
-                isExpanded ? (
-                  <Icon icon="solar:alt-arrow-up-linear" className="w-4 h-4" />
-                ) : (
-                  <Icon icon="solar:alt-arrow-down-linear" className="w-4 h-4" />
-                )
-              }
-            >
-              {isExpanded ? "Show less" : "Show more"}
-            </Button>
-          )}
 
           {/* Footer */}
           <div className="flex items-center justify-between pt-2 border-t border-default-100">

@@ -3,7 +3,7 @@
 import { Tabs, Tab } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
-export type SearchMode = "search" | "answer" | "code";
+export type SearchMode = "search" | "answer" | "research";
 
 interface SearchModeToggleProps {
   mode: SearchMode;
@@ -41,15 +41,6 @@ export function SearchModeToggle({ mode, onModeChange }: SearchModeToggleProps) 
           <div className="flex items-center gap-1.5">
             <Icon icon="solar:chat-round-dots-linear" className="w-4 h-4" />
             <span>Answer</span>
-          </div>
-        }
-      />
-      <Tab
-        key="code"
-        title={
-          <div className="flex items-center gap-1.5">
-            <Icon icon="solar:code-bold" className="w-4 h-4" />
-            <span>Code</span>
           </div>
         }
       />

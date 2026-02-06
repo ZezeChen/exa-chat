@@ -1,6 +1,6 @@
 // Exa API client for Cloudflare Workers (fetch-based, no SDK)
 
-const EXA_API_BASE = "https://api.exa.ai";
+const EXA_API_BASE = process.env.EXA_API_BASE || "https://api.exa.ai";
 
 interface ExaSearchOptions {
   type?: "keyword" | "neural" | "auto";
@@ -101,6 +101,74 @@ export async function exaGetContents(ids: string[], options: ExaContentsOptions 
   if (!response.ok) {
     const error = await response.text();
     throw new Error(`Exa API error: ${error}`);
+  }
+
+  return response.json();
+}
+
+// Research API
+interface ExaResearchTask {
+  researchId?: string;
+  id?: string;
+  status: string;
+}
+
+export interface ExaResearchResult {
+  status: string;
+  output?: {
+    content: string;
+  };
+  citations?: Array<{
+    title: string;
+    url: string;
+  }>;
+  costDollars?: {
+    total: number;
+    numPages: number;
+    numSearches: number;
+  };
+}
+
+export async function exaResearchCreate(
+  instructions: string
+): Promise<ExaResearchTask> {
+  const apiKey = process.env.EXA_API_KEY;
+  if (!apiKey) throw new Error("EXA_API_KEY not configured");
+
+  const response = await fetch(`${EXA_API_BASE}/research/v1`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+    },
+    body: JSON.stringify({
+      instructions,
+      model: "exa-research-pro",
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Exa Research API error: ${error}`);
+  }
+
+  return response.json();
+}
+
+export async function exaResearchStatus(taskId: string): Promise<ExaResearchResult> {
+  const apiKey = process.env.EXA_API_KEY;
+  if (!apiKey) throw new Error("EXA_API_KEY not configured");
+
+  const response = await fetch(`${EXA_API_BASE}/research/v1/${taskId}`, {
+    method: "GET",
+    headers: {
+      "x-api-key": apiKey,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Exa Research API error: ${error}`);
   }
 
   return response.json();

@@ -10,13 +10,11 @@ import {
   Skeleton,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { SearchResult as SearchResultType, SearchResponse, AnswerResponse, CodeResponse, CodeMessage } from "@/lib/types";
+import { SearchResult as SearchResultType, SearchResponse, AnswerResponse, ResearchResponse } from "@/lib/types";
 import { SearchResultCard } from "@/components/SearchResultCard";
-import { Header } from "@/components/Header";
 import { SearchMode } from "@/components/SearchModeToggle";
 import { AnswerCard } from "@/components/AnswerCard";
 import { PromptInput } from "@/components/PromptInput";
-import { SuggestionCards } from "@/components/SuggestionCards";
 
 interface Message {
   id: string;
@@ -25,7 +23,7 @@ interface Message {
   searchResults?: SearchResultType[];
   autoprompt?: string;
   answer?: AnswerResponse;
-  codeAnswer?: CodeResponse;
+  researchAnswer?: ResearchResponse;
   error: string | null;
   isLoading: boolean;
 }
@@ -148,29 +146,12 @@ export default function Home() {
     }
   }, []);
 
-  // Use ref to access messages without causing re-renders
-  const messagesRef = useRef<Message[]>([]);
-  messagesRef.current = messages;
-
-  // Build conversation history for code mode context - use ref to avoid dependency
-  const getCodeConversationHistory = useCallback((): CodeMessage[] => {
-    return messagesRef.current
-      .filter(msg => msg.mode === "code" && !msg.isLoading && !msg.error)
-      .flatMap(msg => {
-        const result: CodeMessage[] = [{ role: "user", content: msg.query }];
-        if (msg.codeAnswer) {
-          result.push({ role: "assistant", content: msg.codeAnswer.answer });
-        }
-        return result;
-      });
-  }, []);
-
-  const handleCode = useCallback(async (codeQuery: string) => {
+  const handleResearch = useCallback(async (researchQuery: string) => {
     const messageId = crypto.randomUUID();
     const newMessage: Message = {
       id: messageId,
-      query: codeQuery,
-      mode: "code",
+      query: researchQuery,
+      mode: "research",
       error: null,
       isLoading: true,
     };
@@ -180,29 +161,23 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      // Get conversation history for context
-      const conversationHistory = getCodeConversationHistory();
-
-      const response = await fetch("/api/code", {
+      const response = await fetch("/api/research", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          query: codeQuery,
-          conversationHistory,
-        }),
+        body: JSON.stringify({ instructions: researchQuery }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to get code answer");
+        throw new Error(errorData.error || "Failed to complete research");
       }
 
-      const data: CodeResponse = await response.json();
+      const data: ResearchResponse = await response.json();
       
       setMessages(prev => 
         prev.map(msg => 
           msg.id === messageId 
-            ? { ...msg, codeAnswer: data, isLoading: false }
+            ? { ...msg, researchAnswer: data, isLoading: false }
             : msg
         )
       );
@@ -217,7 +192,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, [getCodeConversationHistory]);
+  }, []);
 
   const handleSubmit = useCallback(() => {
     if (!query.trim()) return;
@@ -225,14 +200,10 @@ export default function Home() {
       handleSearch(query);
     } else if (mode === "answer") {
       handleAnswer(query);
-    } else {
-      handleCode(query);
+    } else if (mode === "research") {
+      handleResearch(query);
     }
-  }, [mode, query, handleSearch, handleAnswer, handleCode]);
-
-  const handleSuggestionSelect = useCallback((suggestion: string) => {
-    setQuery(suggestion);
-  }, []);
+  }, [mode, query, handleSearch, handleAnswer, handleResearch]);
 
   const handleViewSearchResults = useCallback((searchQuery: string) => {
     setMode("search");
@@ -243,8 +214,6 @@ export default function Home() {
 
   return (
     <div className="h-dvh flex flex-col bg-background">
-      <Header />
-      
       <main className="flex-1 flex flex-col w-full max-w-4xl mx-auto overflow-hidden">
         {!hasMessages ? (
           // Initial state - centered content
@@ -263,12 +232,8 @@ export default function Home() {
                   ? "What would you like to search?" 
                   : mode === "answer" 
                     ? "What would you like to know?"
-                    : "What code question do you have?"}
+                    : "What topic would you like to research?"}
               </h1>
-            </div>
-            
-            <div className="flex justify-center">
-              <SuggestionCards mode={mode} onSelect={handleSuggestionSelect} />
             </div>
           </div>
         ) : (
@@ -289,7 +254,7 @@ export default function Home() {
                         ) : message.mode === "answer" ? (
                           <Icon icon="solar:stars-bold" className="w-4 h-4 shrink-0" />
                         ) : (
-                          <Icon icon="solar:code-bold" className="w-4 h-4 shrink-0" />
+                          <Icon icon="solar:document-text-linear" className="w-4 h-4 shrink-0" />
                         )}
                         <p>{message.query}</p>
                       </CardBody>
@@ -323,17 +288,18 @@ export default function Home() {
                             ))}
                           </div>
                         </div>
-                      ) : message.mode === "code" ? (
-                        // Code loading
+                      ) : message.mode === "research" ? (
+                        // Research loading
                         <Card className="w-full">
                           <CardBody className="p-4 gap-3">
                             <div className="flex items-center gap-2">
-                              <Spinner size="sm" color="primary" />
-                              <span className="text-small text-default-500">Generating code...</span>
+                              <Spinner size="sm" color="secondary" />
+                              <span className="text-small text-default-500">Researching... This may take a few minutes</span>
                             </div>
                             <div className="flex flex-col gap-2">
                               <Skeleton className="w-full h-4 rounded" />
-                              <Skeleton className="w-full h-20 rounded" />
+                              <Skeleton className="w-full h-4 rounded" />
+                              <Skeleton className="w-full h-4 rounded" />
                               <Skeleton className="w-3/4 h-4 rounded" />
                             </div>
                           </CardBody>
@@ -373,7 +339,7 @@ export default function Home() {
                               } else if (message.mode === "answer") {
                                 handleAnswer(message.query);
                               } else {
-                                handleCode(message.query);
+                                handleResearch(message.query);
                               }
                             }}
                           >
@@ -422,14 +388,26 @@ export default function Home() {
                         citations={message.answer.citations}
                         onViewSearchResults={() => handleViewSearchResults(message.query)}
                       />
-                    ) : message.mode === "code" && message.codeAnswer ? (
-                      // Code Answer
-                      <AnswerCard
-                        answer={message.codeAnswer.answer}
-                        citations={message.codeAnswer.citations}
-                        onViewSearchResults={() => handleViewSearchResults(message.query)}
-                        isCodeMode
-                      />
+                    ) : message.mode === "research" && message.researchAnswer?.output?.content ? (
+                      // Research Answer - 直接展示正文
+                      <div className="w-full">
+                        <AnswerCard
+                          answer={message.researchAnswer.output.content}
+                          citations={message.researchAnswer.citations?.map((c, i) => ({
+                            id: String(i),
+                            url: c.url,
+                            title: c.title,
+                          })) || []}
+                          onViewSearchResults={() => handleViewSearchResults(message.query)}
+                        />
+                        {message.researchAnswer.costDollars && (
+                          <div className="text-xs text-default-400 mt-3 px-1">
+                            Cost: ${message.researchAnswer.costDollars.total?.toFixed(4)} | 
+                            Pages: {message.researchAnswer.costDollars.numPages} | 
+                            Searches: {message.researchAnswer.costDollars.numSearches}
+                          </div>
+                        )}
+                      </div>
                     ) : null}
                   </div>
                 </div>
@@ -440,19 +418,14 @@ export default function Home() {
         
         {/* Input area - always at bottom */}
         <div className="bg-background px-4 sm:px-6 py-4">
-          <div className="flex flex-col gap-2">
-            <PromptInput
-              value={query}
-              onValueChange={setQuery}
-              mode={mode}
-              onModeChange={handleModeChange}
-              onSubmit={handleSubmit}
-              isLoading={isLoading}
-            />
-            <p className="text-tiny text-default-400 px-2">
-              Powered by Exa AI. Results may vary.
-            </p>
-          </div>
+          <PromptInput
+            value={query}
+            onValueChange={setQuery}
+            mode={mode}
+            onModeChange={handleModeChange}
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+          />
         </div>
       </main>
     </div>

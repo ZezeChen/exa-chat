@@ -1,20 +1,17 @@
 # Exa Chat
 
-一个基于 [Exa API](https://exa.ai) 的 AI 搜索引擎，支持网页搜索、AI 问答和代码助手三种模式。
+一个基于 [Exa API](https://exa.ai) 的 AI 搜索引擎，支持网页搜索、AI 问答和深度研究三种模式。
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CoolkHz/exa-chat&env=EXA_API_KEY&envDescription=Exa%20API%20Key%20for%20search%20functionality&envLink=https://exa.ai)
 
-![Exa Chat](https://img.shields.io/badge/Next.js-15-black) ![HeroUI](https://img.shields.io/badge/HeroUI-2.8-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Vercel](https://img.shields.io/badge/Vercel-Deploy-black)
 
 ## ✨ 功能特性
 
 - 🔍 **智能搜索** - 使用 Exa API 进行 AI 驱动的网页搜索，支持关键词高亮
 - 💬 **AI 问答** - 直接获取 AI 生成的答案，附带引用来源
-- 💻 **代码助手** - 专业编程问答模式，支持上下文对话
-- 🎨 **现代 UI** - 基于 HeroUI 组件库，支持深色/浅色主题
+- 📚 **深度研究** - 使用 Exa Research API 进行深度主题研究，生成详细报告
 - 📱 **响应式设计** - 完美适配桌面和移动设备
 - ⚡ **极速部署** - 一键部署到 Vercel
-- 🖼️ **代码高亮** - 支持多语言代码语法高亮，主题自适应
+- 🖼️ **代码高亮** - 支持多语言代码语法高亮
 
 ## 🛠️ 技术栈
 
@@ -65,10 +62,11 @@ pnpm install
 cp .env.example .env
 ```
 
-编辑 `.env` 文件，添加你的 Exa API Key：
+编辑 `.env` 文件，配置环境变量：
 
 ```env
 EXA_API_KEY=your_exa_api_key_here
+EXA_API_BASE=https://api.exa.ai
 ```
 
 4. 启动开发服务器
@@ -87,7 +85,7 @@ exa-chat/
 │   ├── api/
 │   │   ├── search/route.ts    # 搜索 API
 │   │   ├── answer/route.ts    # 问答 API
-│   │   ├── code/route.ts      # 代码助手 API
+│   │   ├── research/route.ts  # 深度研究 API
 │   │   └── contents/route.ts  # 内容详情 API
 │   ├── page.tsx               # 主页面
 │   ├── layout.tsx             # 布局
@@ -95,18 +93,18 @@ exa-chat/
 ├── components/
 │   ├── AnswerCard.tsx         # AI 回答卡片
 │   ├── SearchResultCard.tsx   # 搜索结果卡片
-│   ├── PromptInput.tsx        # 输入框组件
-│   ├── SuggestionCards.tsx    # 建议卡片
-│   └── Header.tsx             # 头部导航
+│   └── PromptInput.tsx        # 输入框组件
 └── lib/
+    ├── exa-client.ts          # Exa API 客户端
     └── types.ts               # 类型定义
 ```
 
 ## 🔑 环境变量
 
-| 变量名 | 描述 | 必填 |
-|--------|------|------|
-| `EXA_API_KEY` | Exa API 密钥 | ✅ |
+| 变量名 | 描述 | 必填 | 默认值 |
+|--------|------|------|--------|
+| `EXA_API_KEY` | Exa API 密钥 | ✅ | - |
+| `EXA_API_BASE` | Exa API 基础 URL | ❌ | `https://api.exa.ai` |
 
 ## 📝 使用说明
 
@@ -116,8 +114,8 @@ exa-chat/
 ### 问答模式 ⚡
 输入问题，获取 AI 生成的答案及引用来源，支持 Markdown 渲染。
 
-### 代码模式 💻
-专业编程助手，支持多轮对话上下文，代码语法高亮显示。
+### 研究模式 📚
+输入研究主题，获取深度研究报告，包含详细分析和引用来源。
 
 ## 📄 License
 
