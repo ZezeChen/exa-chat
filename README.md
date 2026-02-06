@@ -3,6 +3,8 @@
 一个基于 [Exa API](https://exa.ai) 的 AI 搜索引擎，支持网页搜索、AI 问答和深度研究三种模式。
 
 
+> 暂时可以在 [https://exa-chat-ze.vercel.app/](https://exa-chat-ze.vercel.app/) 体验。
+
 
 ## ✨ 功能特性
 
